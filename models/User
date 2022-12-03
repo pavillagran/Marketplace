@@ -1,0 +1,24 @@
+const mongoose = require('mongoose')
+
+const userSchema = new mongoose.Schema({
+    nombre: {
+      type: String,
+      required: true,
+      default: 'Usuario no asignado',
+      trim: true,
+      lowercase: true
+     
+    },
+    apellido: { type: String, required: false, trim: true },
+    correo: { type: String, required: true, unique: false },  // unique: deberia ser unico y chequearse
+    edad: { type: Number, required: true, min: 18, max: 130},
+    favProducts: [{ type: mongoose.Types.ObjectId, ref: 'product' }],
+    direccion: { type: String, required: true, max: 30},
+    password: { type: String, required: true, min: 6},
+    salt: {type: String, required: true},
+    token: { type:String, required: false}
+})
+
+const User = mongoose.model('user', userSchema)
+
+module.exports = User
