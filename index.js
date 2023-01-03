@@ -3,7 +3,6 @@ const connectDB = require('./config/db');
 require('dotenv').config();  // variable de entorno  - port express  -  datos db mongo
 const cors = require('cors')
 
-//const jwt = require('jsonwebtoken')
 
 // Creando server de express
 const app = express()
@@ -26,6 +25,18 @@ app.use('/api/auth', require('./routes/auth') );  //todo lo exportado en routes/
 
 // RUTA DE AGREGAR USERS
 //app.use('/api', require('./routes/index'));
+
+
+
+//heroku
+/*
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static('frontend/build'))
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(__dirname + '/frontend/build/index.html'))
+    })
+  }
+*/
 
 //escuchar peticiones
 app.listen( process.env.PORT,()=> {

@@ -62,66 +62,72 @@ const crearUsuario = async (req, res ) => {
 
 /* LOGIN DE USUARIO */ 
     const loginUsuario = async (req, res ) => {        
-    const {  correo, password} = req.body    // destructurando,, usando partes de req.body
+        const { correo, password} = req.body    // destructurando,, usando partes de req.body
 
-    //Manejo de errores de auth recibiendo de validationResult
-    const errors = validationResult( req );
+        //Manejo de errores de auth recibiendo de validationResult
+        const errors = validationResult( req );
 
-    if (!errors.isEmpty()) {
-        return res.status(400).json ({
-            ok: false,
-            errors: errors.mapped()
-        })
-    }
-
-    try {
-        const user = await User.findOne({correo:req.body.correo})  
-        if ( !user ) {   
-            return  res.status(400).json({
-            ok: false,
-            errors: 'El usuario no existe con ese correo.'
-            });
-        } 
-
-        const hash = crypto.pbkdf2Sync(password, user.salt, 10000, 512, 'sha512').toString('hex')    
-
-        if(user.password != hash) {
-        return res.status(400).json({
-        ok: false,
-        errors: 'Las claves no coinciden.'
-        });
-        }  
-        //GENERAR JWT  login
-         //generar JWT
-          const token = generarJWT(user._id, user.nombre)
-    
-          
-
-        res.status(201).json({
-            ok:true,
-            msg: 'Usuario logeado.',
-            correo,
-            password,
-            token
-        });
-
-
-    } catch (error) {
-        console.log(error)
-            res.status(500).json({
+        if (!errors.isEmpty()) {
+            return res.status(400).json ({
                 ok: false,
-                msg: 'Contacte al administrador.'
-            });
+                errors: errors.mapped()
+            })
         }
+
+        try {
+            const user = await User.findOne({correo:req.body.correo})  
+            if ( !user ) {   
+                return  res.status(400).json({
+                ok: false,
+                errors: 'El usuario no existe con ese correo.'
+                });
+            } 
+
+            const hash = crypto.pbkdf2Sync(password, user.salt, 10000, 512, 'sha512').toString('hex')    
+
+            if(user.password != hash) {
+            return res.status(400).json({
+            ok: false,
+            errors: 'Las claves no coinciden.'
+            });
+            }  
+            //GENERAR JWT  login
+            //generar JWT
+            const token = generarJWT(user._id, user.nombre)
+               
+
+            res.status(201).json({
+                ok:true,
+                msg: 'Usuario logeado.',
+                correo,
+                password,
+                token
+            });
+
+
+        } catch (error) {
+            console.log(error)
+                res.status(500).json({
+                    ok: false,
+                    msg: 'Contacte al administrador.'
+                });
+            }
 
 
 }
 
-
-const revalidarToken = (req, res = response) => {        
+// REVALIDANDO TOKEN
+const revalidarToken = async (req, res = response) => {        
+    const uid = req.uid;
+    const name = req.name; 
+    const token = await generarJWT(uid, name)
     res.json({
         ok:true,
-        msg: 'rev token'
+        //uid,
+       // name,
+        token,
+        msg: 'Revalidado el token.'
+        
     });
 }
 
